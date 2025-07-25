@@ -285,9 +285,15 @@
         </div>
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
-        const socket = io();
+        // Połącz z serwerem Socket.IO na twoim hostingu
+        // Zastąp 'https://twój-serwer.com' swoim adresem
+        const socket = io('https://twój-serwer.com', {
+            path: '/socket.io',
+            transports: ['websocket']
+        });
+        
         const chatBox = document.getElementById('chat-box');
         
         // Aktualizacja UI
