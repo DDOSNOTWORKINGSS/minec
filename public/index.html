@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bot Control Panel</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --dark: #1a2530;
+            --light: #ecf0f1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark), #1d2b38);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--secondary);
+            text-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        }
+        
+        .panels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .panel {
+            background: rgba(30, 40, 50, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+        
+        .panel h2 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel h2 i {
+            font-size: 1.3rem;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .status-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .status-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        .status-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 5px;
+            color: var(--secondary);
+        }
+        
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+        
+        .chat-message {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .command-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .command-btn:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .danger {
+            background: var(--danger);
+        }
+        
+        .danger:hover {
+            background: #c0392b;
+        }
+        
+        .success {
+            background: var(--success);
+        }
+        
+        .success:hover {
+            background: #27ae60;
+        }
+        
+        .command-input {
+            display: flex;
+            margin-top: 15px;
+        }
+        
+        #custom-command {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px 0 0 8px;
+            border: none;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        
+        #send-command {
+            padding: 12px 20px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+        }
+        
+        .health-bar {
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+            position: relative;
+        }
+        
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e74c3c, #f39c12);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .health-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 2px black;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Kontroler Bota Minecraft</h1>
+            <p>Steruj swoim botem w czasie rzeczywistym</p>
+        </header>
+        
+        <div class="panels">
+            <div class="panel">
+                <h2>📊 Status Bota</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-label">Pozycja</span>
+                        <span class="status-value" id="position">N/A</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Tryb</span>
+                        <span class="status-value" id="mode">Czekam...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Cel</span>
+                        <span class="status-value" id="target">Brak</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Ostatnia akcja</span>
+                        <span class="status-value" id="lastAction">Brak</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Zdrowie</span>
+                        <div class="health-bar">
+                            <div class="health-fill" id="health-fill"></div>
+                            <div class="health-text" id="health-text">20</div>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Głód</span>
+                        <div class="health-bar">
+                            <div class="health-fill" id="food-fill"></div>
+                            <div class="health-text" id="food-text">20</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>🎮 Szybkie Komendy</h2>
+                <div class="command-grid">
+                    <button class="command-btn" data-cmd="$come">Przyjdź</button>
+                    <button class="command-btn" data-cmd="$jump">Skocz</button>
+                    <button class="command-btn" data-cmd="$dance">Tańcz</button>
+                    <button class="command-btn" data-cmd="$stop">Stop</button>
+                    <button class="command-btn success" data-cmd="$status">Status</button>
+                    <button class="command-btn" data-cmd="$help">Pomoc</button>
+                    <button class="command-btn danger" data-cmd="$stop">Wyłącz</button>
+                </div>
+                
+                <div class="command-input">
+                    <input type="text" id="custom-command" placeholder="Wpisz komendę...">
+                    <button id="send-command">Wyślij</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>💬 Czat Gry</h2>
+            <div class="chat-box" id="chat-box">
+                <div>Czekam na wiadomości...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const chatBox = document.getElementById('chat-box');
+        
+        // Aktualizacja UI
+        socket.on('bot-update', (data) => {
+            document.getElementById('position').textContent = data.position;
+            document.getElementById('mode').textContent = data.mode;
+            document.getElementById('target').textContent = data.target;
+            document.getElementById('lastAction').textContent = data.lastAction;
+            
+            document.getElementById('health-fill').style.width = `${(data.health / 20) * 100}%`;
+            document.getElementById('health-text').textContent = data.health;
+            
+            document.getElementById('food-fill').style.width = `${(data.food / 20) * 100}%`;
+            document.getElementById('food-text').textContent = data.food;
+        });
+        
+        // Obsługa czatu
+        socket.on('chat-message', (msg) => {
+            const msgElement = document.createElement('div');
+            msgElement.className = 'chat-message';
+            msgElement.textContent = msg;
+            chatBox.insertBefore(msgElement, chatBox.firstChild);
+            
+            if (chatBox.children.length > 100) {
+                chatBox.removeChild(chatBox.lastChild);
+            }
+        });
+        
+        // Wysyłanie komend
+        document.querySelectorAll('.command-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const command = btn.getAttribute('data-cmd');
+                socket.emit('send-command', command);
+                document.getElementById('custom-command').value = command;
+            });
+        });
+        
+        document.getElementById('send-command').addEventListener('click', () => {
+            const command = document.getElementById('custom-command').value.trim();
+            if (command) {
+                socket.emit('send-command', command);
+                document.getElementById('custom-command').value = '';
+            }
+        });
+        
+        document.getElementById('custom-command').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('send-command').click();
+            }
+        });
+    </script>
+</body>
+</html>
