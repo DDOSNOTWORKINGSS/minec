@@ -14,7 +14,7 @@ const io = require('socket.io')(http, {
 // Konfiguracja GUI
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, '0.0.0.0', () => {
-  console.log(`🌐 Publiczny panel: http://twój-serwer.com:${PORT}`);
+  console.log(`🌐 Publiczny panel: http://top0srddd.com:${PORT}`);
 });
 
 // Obsługa statycznych plików
